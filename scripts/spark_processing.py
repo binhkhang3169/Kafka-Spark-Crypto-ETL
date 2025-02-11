@@ -1,7 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, from_json, expr
 from pyspark.sql.types import StructType, StructField, StringType, FloatType, BooleanType, LongType
-from pyspark.sql.avro.functions import from_avro
 
 # Tạo SparkSession
 spark = SparkSession.builder \
@@ -54,8 +53,7 @@ df_transformed.writeStream \
     .start() \
     .awaitTermination()
 
-
-
+# Đọc dữ liệu từ staging_transactions
 staging_df = spark.read \
     .format("jdbc") \
     .option("url", "jdbc:postgresql://postgres:5432/crypto_db") \
@@ -65,6 +63,7 @@ staging_df = spark.read \
     .option("driver", "org.postgresql.Driver") \
     .load()
 
+# Tính toán và ghi vào fact_trades
 fact_df = staging_df.withColumn("total_value", col("price") * col("quantity"))
 
 fact_df.write \
@@ -77,3 +76,25 @@ fact_df.write \
     .mode("append") \
     .save()
 
+# Tạo và ghi vào các bảng dim
+dim_symbols = staging_df.select("symbol").distinct()
+dim_symbols.write \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://postgres:5432/crypto_db") \
+    .option("dbtable", "dim_symbols") \
+    .option("user", "postgres") \
+    .option("password", "password") \
+    .option("driver", "org.postgresql.Driver") \
+    .mode("overwrite") \
+    .save()
+
+dim_time = staging_df.select("time").distinct()
+dim_time.write \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://postgres:5432/crypto_db") \
+    .option("dbtable", "dim_time") \
+    .option("user", "postgres") \
+    .option("password", "password") \
+    .option("driver", "org.postgresql.Driver") \
+    .mode("overwrite") \
+    .save()
