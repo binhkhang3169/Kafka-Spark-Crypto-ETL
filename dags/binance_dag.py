@@ -65,7 +65,6 @@ def format_binance_trades(trades):
 
     for trade in trades:
         data = {
-            "id": str(uuid.uuid4()),  # Tạo UUID ngẫu nhiên
             "trade_id": trade['id'],  # ID giao dịch từ Binance
             "price": float(trade['price']),  # Giá giao dịch
             "quantity": float(trade['qty']),  # Số lượng giao dịch
@@ -112,7 +111,8 @@ def stream_binance_trades():
 
             # Gửi từng giao dịch đến Kafka topic
             for trade in formatted_trades:
-                producer.send('binance_trades', json.dumps(trade).encode('utf-8'))
+                producer.send('binance_trades5', json.dumps(trade).encode('utf-8'))
+                time.sleep(1)
         except Exception as e:
             logging.error(f'An error occurred: {e}')
             continue
