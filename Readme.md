@@ -41,12 +41,12 @@ The project is designed with the following components:
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/binhkhang3169/e2e-data-engineering.git
+    https://github.com/binhkhang3169/Kafka-Spark-Crypto-ETL.git
     ```
 
 2. Navigate to the project directory:
     ```bash
-    cd e2e-data-engineering
+    cd Kafka-Spark-Crypto-ETL
     ```
 
 3. Run Docker Compose to spin up the services:
